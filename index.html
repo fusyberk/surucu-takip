@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Sürücü Takip — Direksiyon Eğitmeni Asistanı</title>
+    <meta
+      name="description"
+      content="Direksiyon eğitmenleri için çevrimdışı çalışan kursiyer, eğitim ve sınav takip uygulaması."
+    />
+    <meta property="og:title" content="Sürücü Takip — Direksiyon Eğitmeni Asistanı" />
+    <meta
+      property="og:description"
+      content="Direksiyon eğitmenleri için çevrimdışı çalışan kursiyer, eğitim ve sınav takip uygulaması."
+    />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="theme-color" content="#0F274A" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="SürücüTakip" />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' fill='none'%3E%3Crect width='512' height='512' rx='112' fill='%230F274A'/%3E%3Ccircle cx='256' cy='256' r='144' stroke='%23FFFFFF' stroke-width='28'/%3E%3Ccircle cx='256' cy='256' r='32' fill='%2338BDF8'/%3E%3Cpath d='M118 238C158 220 206 212 256 212C306 212 354 220 394 238' stroke='%23FFFFFF' stroke-width='26' stroke-linecap='round'/%3E%3Cpath d='M256 288V398' stroke='%23FFFFFF' stroke-width='28' stroke-linecap='round'/%3E%3Cpath d='M224 268L142 332' stroke='%23FFFFFF' stroke-width='24' stroke-linecap='round'/%3E%3Cpath d='M288 268L370 332' stroke='%23FFFFFF' stroke-width='24' stroke-linecap='round'/%3E%3C/svg%3E"
+    />
+    <script data-keep="true">
+      (function () {
+        function extractLineFromStack(stack) {
+          if (!stack) return '';
+          var m = String(stack).match(/:(\d+):(\d+)/);
+          if (m) return 'Satır: ' + m[1] + ', Sütun: ' + m[2];
+          return '';
+        }
+
+        function showErrorBox(title, message, lineInfo, detail) {
+          try {
+            var render = function () {
+              var host = document.body || document.documentElement;
+              if (!host) return;
+              var existing = document.getElementById('global-fatal-error-overlay');
+              if (existing && existing.parentNode) {
+                existing.parentNode.removeChild(existing);
+              }
+
+              var overlay = document.createElement('div');
+              overlay.id = 'global-fatal-error-overlay';
+              overlay.style.cssText =
+                'position:fixed;inset:0;z-index:2147483647;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(15,23,42,0.72);font-family:system-ui,-apple-system,sans-serif;';
+
+              var box = document.createElement('div');
+              box.style.cssText =
+                'width:100%;max-width:520px;background:#FEF2F2;color:#7F1D1D;border:2px solid #DC2626;border-radius:16px;padding:20px;box-shadow:0 20px 45px rgba(0,0,0,0.3);box-sizing:border-box;';
+
+              var h = document.createElement('h2');
+              h.textContent = title || 'Beklenmeyen Uygulama Hatası';
+              h.style.cssText = 'margin:0 0 8px 0;font-size:18px;font-weight:700;color:#991B1B;';
+              box.appendChild(h);
+
+              var msg = document.createElement('p');
+              msg.textContent = message || 'Bilinmeyen bir hata oluştu.';
+              msg.style.cssText = 'margin:0 0 10px 0;font-size:14px;line-height:1.5;font-weight:600;word-break:break-word;';
+              box.appendChild(msg);
+
+              if (lineInfo) {
+                var ln = document.createElement('p');
+                ln.textContent = lineInfo;
+                ln.style.cssText = 'margin:0 0 10px 0;font-size:13px;font-family:ui-monospace,monospace;background:#FEE2E2;padding:8px 10px;border-radius:8px;color:#991B1B;';
+                box.appendChild(ln);
+              }
+
+              if (detail) {
+                var pre = document.createElement('pre');
+                pre.textContent = detail;
+                pre.style.cssText = 'margin:0 0 14px 0;max-height:160px;overflow:auto;font-size:11px;line-height:1.4;font-family:ui-monospace,monospace;background:#FFFFFF;border:1px solid #FECACA;padding:8px 10px;border-radius:8px;color:#7F1D1D;white-space:pre-wrap;word-break:break-word;';
+                box.appendChild(pre);
+              }
+
+              var btn = document.createElement('button');
+              btn.type = 'button';
+              btn.textContent = 'Sayfayı Yenile';
+              btn.style.cssText = 'width:100%;min-height:44px;border:none;border-radius:10px;background:#DC2626;color:#FFFFFF;font-size:14px;font-weight:700;cursor:pointer;';
+              btn.onclick = function () {
+                window.location.reload();
+              };
+              box.appendChild(btn);
+
+              overlay.appendChild(box);
+              host.appendChild(overlay);
+            };
+
+            if (document.body) {
+              render();
+            } else {
+              window.addEventListener('DOMContentLoaded', render);
+            }
+          } catch (e) {
+            // Last-resort silent fallback
+          }
+        }
+
+        window.__showFatalErrorBox = showErrorBox;
+
+        window.onerror = function (message, source, lineno, colno, error) {
+          var lineText = lineno ? 'Satır: ' + lineno + (colno ? ', Sütun: ' + colno : '') : extractLineFromStack(error && error.stack);
+          if (source) {
+            lineText = (lineText ? lineText + ' · ' : '') + String(source);
+          }
+          showErrorBox(
+            'JavaScript Hatası',
+            String(message || (error && error.message) || 'Bilinmeyen hata'),
+            lineText || 'Satır bilgisi alınamadı',
+            error && error.stack ? String(error.stack) : ''
+          );
+          return false;
+        };
+
+        window.addEventListener('unhandledrejection', function (event) {
+          var reason = event && event.reason;
+          var msg = reason && reason.message ? reason.message : String(reason || 'İşlenmeyen Promise hatası');
+          var stack = reason && reason.stack ? String(reason.stack) : '';
+          showErrorBox(
+            'Asenkron İşlem Hatası',
+            msg,
+            extractLineFromStack(stack) || 'Satır bilgisi alınamadı',
+            stack
+          );
+        });
+      })();
+    </script>
+  </head>
+  <body class="bg-slate-50 text-slate-900 antialiased dark:bg-slate-950 dark:text-slate-100">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
